@@ -12,16 +12,21 @@ import androidx.lifecycle.ViewModelProvider
 import r.d.composition.R
 import r.d.composition.databinding.FragmentGameBinding
 import r.d.composition.domain.entity.GameResult
-import r.d.composition.domain.entity.GameSettings
 import r.d.composition.domain.entity.Level
 
 class GameFragment : Fragment() {
 
+    private val viewModelFactory by lazy {
+        GameViewModelFactory(
+            level,
+            requireActivity().application
+        )
+    }
     private lateinit var level: Level
     private val viewModel: GameViewModel by lazy {
         ViewModelProvider(
             this,
-            ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)
+            viewModelFactory
         )[GameViewModel::class.java]
     }
 
@@ -57,7 +62,6 @@ class GameFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         observeViewModel()
         setClickListenersToOptions()
-        viewModel.startGame(level)
     }
 
     private fun setClickListenersToOptions() {
@@ -87,7 +91,7 @@ class GameFragment : Fragment() {
             binding.progressBar.progressTintList = ColorStateList.valueOf(color)
         }
         // !!!!!!!!!!!! formatted - это возможно formattedTime
-        viewModel.formatted.observe(viewLifecycleOwner) {
+        viewModel.formattedTime.observe(viewLifecycleOwner) {
             binding.tvTimer.text = it
         }
         viewModel.minPercent.observe(viewLifecycleOwner) {
